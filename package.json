@@ -1,0 +1,23 @@
+{
+  "name": "playwright-with-fixtures",
+  "version": "1.0.0",
+  "description": "using the fixtures in playwright - POC",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NDPPhap/playwright-with-fixtures.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/NDPPhap/playwright-with-fixtures/issues"
+  },
+  "homepage": "https://github.com/NDPPhap/playwright-with-fixtures#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.2"
+  }
+}
