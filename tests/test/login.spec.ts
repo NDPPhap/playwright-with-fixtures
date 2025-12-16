@@ -1,5 +1,5 @@
 import { expect, test } from "../page/base";
-import testData from "../test-data/standard-data.json";
+import testData from "../../test-data/standard-data.json";
 
 test.describe('Login Test Suite', () => {
     test('should logged in successfully with standard user', async ({ loginPage }) => {

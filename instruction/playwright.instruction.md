@@ -6,16 +6,15 @@ applyTo: '**'
 ## Test Writing Guidelines
 
 ### Code Quality Standards
-- **Locators**: Prioritize user-facing, role-based locators (`getByRole`, `getByLabel`, `getByText`, etc.) for resilience and accessibility. Use `test.step()` to group interactions and improve test readability and reporting.
+- **Locators**: Prioritize user-facing, role-based locators (`getByTestId`,`getByRole`, `getByLabel`, `getByText`, etc.) for resilience and accessibility. Use `@step` decorator in `<base.ts>` to group interactions and improve test readability and reporting.
 - **Assertions**: Use auto-retrying web-first assertions. These assertions start with the `await` keyword (e.g., `await expect(locator).toHaveText()`). Avoid `expect(locator).toBeVisible()` unless specifically testing for visibility changes.
 - **Timeouts**: Rely on Playwright's built-in auto-waiting mechanisms. Avoid hard-coded waits or increased default timeouts.
 - **Clarity**: Use descriptive test and step titles that clearly state the intent. Add comments only to explain complex logic or non-obvious interactions.
 
 
 ### Test Structure
-- **Imports**: Start with `import { test, expect } from '@playwright/test';`.
+- **Imports**: Start with `import { test, expect } from '../../page/base';`. For data test `import testData from "../../test-data/standard-data.json";`
 - **Organization**: Group related tests for a feature under a `test.describe()` block.
-- **Hooks**: Use `beforeEach` for setup actions common to all tests in a `describe` block (e.g., navigating to a page).
 - **Titles**: Follow a clear naming convention, such as `Feature - Specific action or scenario`.
 
 
@@ -27,27 +26,26 @@ applyTo: '**'
 
 ```
 tests/
-  hooks/         # Setup and teardown logic (e.g., TestSuiteSetup.hooks.ts)
   page/          # Page Object Models for each page (e.g., HomePage.page.ts)
+                 # and a base file for setting up fixtures
   test/          # Actual test cases (e.g., homepage.test.ts)
 ```
 
 **Folder Purposes:**
-- `hooks/`: Shared setup/teardown logic, reusable across tests.
-- `page/`: Page Object Model files, encapsulate selectors and page actions.
+- `helper` : All typescripts functions using for handle/support the test cases as random number, random email/user,...
+- `test-data/standard-data.json`: Use for dynamic test data (e.g., usernames, passwords, product names, prices) to make tests reusable and avoid hardcoding values.
+- `page/`: Page Object Model files (e.g., LoginPage.page.ts) to encapsulate selectors and page actions, and a base file for setting up fixtures.
 - `test/`: Test case files, grouped by feature or page.
 
 **Naming Conventions:**
-- Hooks: `<Feature>Setup.hooks.ts` (e.g., `TestSuiteSetup.hooks.ts`)
 - Page Objects: `<PageName>.page.ts` (e.g., `HomePage.page.ts`)
 - Tests: `<feature-or-page>.test.ts` (e.g., `homepage.test.ts`)
 
 **Example Folder Structure:**
 ```
 tests/
-  hooks/
-    TestSuiteSetup.hooks.ts
   page/
+    base.ts
     HomePage.page.ts
   test/
     homepage.test.ts
@@ -66,34 +64,16 @@ tests/
 ## Example Test Structure
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { expect, test } from "../page/base";
+import testData from "../../test-data/standard-data.json";
 
-test.describe('Movie Search Feature', () => {
-    let testSuiteSetup: TestSuiteSetup;
-    let homePage: HomePage;
-
-    test.beforeAll(async ({ }, testInfo) => {   
-        testSuiteSetup = new TestSuiteSetup();
-        const projectName = testInfo.project.name; 
-        await testSuiteSetup.beforeAll(projectName);
-        homePage = new HomePage(testSuiteSetup.getPage());
-    })
-
-    test.beforeEach(async () => {
-        await homePage.goto();
-    })
-
-    test("Verify that the DSTA logo should be displayed", async () => { 
-            await expect(homePage.logoDTSA).toBeVisible();
-    })
-
-    test("Verify that the user can click on a social media feed in [Connect With Us] section", async () => {
-        const homePageTitle = await homePage.getPageTitle();
-        const newTab = await homePage.clickOnRandomSocialMedia();
-        const socialTitle = await newTab.title();
-        console.log(homePageTitle,'===',socialTitle);
-        expect(homePageTitle).not.toEqual(socialTitle);
-    })
+test.describe('Login Test Suite', () => {
+   test('should logged in successfully with standard user', async ({ loginPage }) => {
+        await loginPage.goto();
+        await loginPage.login(testData.credentials.standard_user, testData.credentials.password);
+        // Add assertions here to verify successful login
+        await expect(loginPage.page).toHaveURL(/inventory.html/);
+    });
 });
 ```
 
@@ -110,6 +90,7 @@ test.describe('Movie Search Feature', () => {
 Before finalizing tests, ensure:
 - [ ] All locators are accessible and specific and avoid strict mode violations
 - [ ] Tests are grouped logically and follow a clear structure
+- [ ] Ensure all Page Objects are added as fixtures in the `<base.ts>` file (e.g., extend the `test.extend` object with new POM instances)
 - [ ] Assertions are meaningful and reflect user expectations
 - [ ] Tests follow consistent naming conventions
 - [ ] Code is properly formatted and commented
