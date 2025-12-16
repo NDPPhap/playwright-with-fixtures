@@ -36,7 +36,7 @@ test.describe('Login Test Suite', () => {
         await expect(errorMessage).toHaveText('Epic sadface: Username is required');
     });
 
-    test.only('should show the error message when password is missing', async ({ loginPage }) => {
+    test('should show the error message when password is missing', async ({ loginPage }) => {
         await loginPage.goto();
         await loginPage.login(testData.credentials.standard_user, '');
         // Add assertions here to verify error message

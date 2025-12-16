@@ -8,14 +8,12 @@ type setUpFixtures = {
     loginPage: LoginPage;
     productPage: ProductPage;
     cartManagementPage: CartManagementPage;
+    hookSetup: void;
 }
 
 export const test = base.extend<setUpFixtures>({
     loginPage: async ({ page }, use) => {
         await use(new LoginPage(page));
-
-        await page.close();
-        await page.context().close();
     },
     productPage: async ({ loginPage }, use) => {
         // Navigate to login page and log in
@@ -28,7 +26,11 @@ export const test = base.extend<setUpFixtures>({
         await use(new CartManagementPage(page));
     },
 
-    
+    hookSetup: [async ({ page }, use) => {
+        await use();
+        // context cleanup for each test
+        await page.context().close();
+    }, { auto: true }],
 });
 
 export { expect } from '@playwright/test';
